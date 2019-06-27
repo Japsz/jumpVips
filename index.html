@@ -30,7 +30,7 @@
 </head>
 <body>
 <section id="header">
-    <div class="container">
+    <div class="container" id="timers">
         <div class='banner text-center'>
             <h1 class="section-title wow bounceInDown animated"><span>Tiempos</span></h1>
             <div class="col-sm-12 col-md-12">
@@ -45,30 +45,76 @@
             <div id="ups"></div>
         </div>
     </div>
-    <script src="/socket.io/socket.io.js"></script>
-    <!-- jQuery Load -->
-    <script src="/assets/js/jquery-min.js"></script>
-    <script>
-        var socket = io("http://127.0.0.1:4300");
+</section>
+<section id="blog" class="hidden">
+    <video src="" id="videoAd" muted="true" width="100%" height="100%"></video>
+</section>
+<script src="/socket.io/socket.io.js"></script>
+<!-- jQuery Load -->
+<script src="/assets/js/jquery-min.js"></script>
+<script>
+    var socket = io("http://127.0.0.1:4300");
+    $.ajax({
+        url:"http://localhost:4300/table_stream",
+        success: function (data) {
+            $("#tabla").html(data);
+        }
+    });
+    $(document).ready(function(){
+        var video = document.getElementById('videoAd');
+        var adTimer = setTimeout(function(){
+            socket.emit('isVideoPosible',function(err,obj){
+                if(err){
+                    console.log(err)
+                    resetTimer();
+                } else {
+                    if(obj.playVideo){
+                        $("#header").addClass('hidden');
+                        $("#blog").removeClass('hidden');
+                        video.src = obj.src;
+                        video.play();
+                    } else {
+                        resetTimer();
+                    }
+                }
+            });
+        },1000*6);
+        function resetTimer(){
+            clearTimeout(adTimer);
+            adTimer = setTimeout(function(){
+                socket.emit('isVideoPosible',function(err,obj){
+                    if(err){
+                        console.log(err);
+                        resetTimer();
+                    } else {
+                        if(obj.playVideo){
+                            $("#header").addClass('hidden');
+                            $("#blog").removeClass('hidden');
+                            video.src = obj.src;
+                            video.play();
+                        } else {
+                            resetTimer();
+                        }
+                    }
+                });
+            },1000*30);
+        };
+        video.addEventListener('ended',function(e){
+            $("#blog").addClass('hidden');
+            $("#header").removeClass('hidden');
+            resetTimer();
+        });
+    });
+    socket.on('ajax',function(){
         $.ajax({
             url:"http://localhost:4300/table_stream",
             success: function (data) {
                 $("#tabla").html(data);
             }
         });
-        socket.on('ajax',function(){
-            $.ajax({
-                url:"http://localhost:4300/table_stream",
-                success: function (data) {
-                    $("#tabla").html(data);
-                }
-            });
-        });
-    </script>
+    });
+</script>
 
-
-
-</section>
 <!-- Bootstrap JS -->
 <script src="/assets/js/bootstrap.min.js"></script>
 <!-- WOW JS plugin for animation -->
