@@ -1,15 +1,18 @@
 {
-  "name": "Jumpcaja",
+  "main":"index.html",
+  "name": "JumpVIps",
   "version": "1.0.0",
   "description": "Portal Ventas",
-  "main": "index.html",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
+  "chromium-args": "--kiosk",
   "window": {
-    "resizable": false,
-    "kiosk": true,
-    "fullscreen": true
+    "title": "node-webkit demo",
+    "icon": "link.png",
+    "toolbar": false,
+    "frame": false,
+    "kiosk": true
+  },
+  "webkit": {
+    "plugin": true
   },
   "author": "Node Quantum"
 }
